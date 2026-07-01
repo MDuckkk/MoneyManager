@@ -2,19 +2,18 @@
 
 Ứng dụng full-stack giúp người dùng theo dõi **thu nhập, chi tiêu** và **quản lý ngân sách** hằng tháng, kèm dashboard trực quan.
 
-> Bài take-home cho vị trí Junior Fullstack Developer. Tài liệu thiết kế chi tiết ở thư mục [`docs/`](./docs).
+> Bài take-home cho vị trí Junior Fullstack Developer.
 
 ![stack](https://img.shields.io/badge/Backend-NestJS%20%2B%20TypeORM-E0234E) ![stack](https://img.shields.io/badge/Frontend-React%2019%20%2B%20Vite-61DAFB) ![db](https://img.shields.io/badge/DB-PostgreSQL-336791)
 
 ### 🌐 Sản phẩm đang chạy (live)
 
 - **Web:** https://money.mduckkk.me
-- **API:** https://api.money.mduckkk.me/api (Swagger: `/api/docs`)
 - **Tài khoản demo:** `demo@money.app` / `password123`
 
 > ⚠️ **Lưu ý quan trọng về OCR trên production**
-> Tính năng **Quét hóa đơn (OCR)** đã được **phát triển đầy đủ và chạy được ở môi trường local** (service riêng trong [`ocr_service/`](./ocr_service), pipeline PaddleOCR + Surya), nhưng **KHÔNG được deploy lên production** vì **hạ tầng hiện tại chưa có GPU**. Trên CPU, mô hình nhận dạng Surya mất tới vài phút cho mỗi ảnh nên không đáp ứng thời gian phản hồi thực tế.
-> ➡️ Vì vậy bản deploy tại `money.mduckkk.me` chỉ gồm **Frontend + Backend + PostgreSQL**; OCR chạy/demo ở local. Chi tiết giả định & hướng phát triển ở mục [Giả định & Giới hạn](#-giả-định--giới-hạn) và [`docs/06-ocr-feature.md`](./docs/06-ocr-feature.md).
+> Tính năng **Quét hóa đơn (OCR)** đã được **phát triển đầy đủ và chạy được ở môi trường local** (service riêng trong `ocr_service/`, pipeline PaddleOCR + Surya), nhưng **KHÔNG được deploy lên production** vì **hạ tầng hiện tại chưa có GPU**. Trên CPU, mô hình nhận dạng Surya mất tới vài phút cho mỗi ảnh nên không đáp ứng thời gian phản hồi thực tế.
+> ➡️ Vì vậy bản deploy tại `money.mduckkk.me` chỉ gồm **Frontend + Backend + PostgreSQL**; OCR chạy/demo ở local. Chi tiết ở mục [Giả định & Giới hạn](#-giả-định--giới-hạn).
 
 ---
 
@@ -28,15 +27,13 @@
 | **Ngân sách** | Đặt hạn mức theo tháng, theo dõi tiến độ + cảnh báo vượt (SAFE/WARNING/EXCEEDED) |
 | **Tổng quan** | KPI thu/chi/số dư, biểu đồ cơ cấu chi (donut), thu-chi theo tháng (bar), so sánh tháng trước |
 
-> 🧾 **Quét hóa đơn (OCR)** — đã hiện thực đầy đủ dưới dạng service riêng ([`ocr_service/`](./ocr_service)) và ẩn sau interface `OcrProvider`. **Chạy được ở local**, nhưng chưa deploy production do chưa có GPU (xem lưu ý ở đầu README) — chi tiết [`docs/06-ocr-feature.md`](./docs/06-ocr-feature.md).
+> 🧾 **Quét hóa đơn (OCR)** — đã hiện thực đầy đủ dưới dạng service riêng (`ocr_service/`) và ẩn sau interface `OcrProvider`. **Chạy được ở local**, nhưng chưa deploy production do chưa có GPU (xem lưu ý ở đầu README).
 
 ## 🛠️ Công nghệ
 
-- **Backend:** NestJS 11, TypeORM 0.3, PostgreSQL, JWT (Passport-less guard), class-validator, Swagger.
+- **Backend:** NestJS 11, TypeORM 0.3, PostgreSQL, JWT (Passport-less guard), class-validator.
 - **Frontend:** React 19, Vite, React Router 7, Axios, Recharts. CSS thuần với design system (light/dark).
 - **Kiến trúc:** phân lớp Controller → Service → Repository; tổ chức theo **feature module** (BE) và **feature folder** (FE).
-
-Cấu trúc thư mục tuân theo dự án tham chiếu (module/feature-based). Chi tiết: [`docs/03-architecture.md`](./docs/03-architecture.md).
 
 ---
 
@@ -57,7 +54,7 @@ cd backend
 cp .env.example .env         # đã có sẵn .env mặc định khớp docker-compose
 npm install
 npm run seed                 # tạo dữ liệu mẫu + tài khoản demo
-npm run start:dev            # API: http://localhost:1111/api  (Swagger: /api/docs)
+npm run start:dev            # chạy tại http://localhost:1111
 ```
 
 ### 3. Frontend
@@ -95,7 +92,7 @@ cp .env.example .env         # điền domain + secret (JWT, DB password)
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-- **Web** → `money.mduckkk.me`, **API** → `api.money.mduckkk.me` (reverse proxy qua Caddy).
+- Truy cập tại `money.mduckkk.me` (Caddy làm reverse proxy + tự cấp TLS).
 - Thành phần deploy: **Frontend + Backend (NestJS) + PostgreSQL**. **Không gồm OCR** (xem lưu ý ở đầu README).
 
 ---
@@ -114,7 +111,6 @@ npm test                     # unit test cho logic ngân sách (status, percenta
 ```
 Money_manager/
 ├─ docker-compose.yml        # PostgreSQL
-├─ docs/                     # tài liệu thiết kế (overview → API → OCR → roadmap)
 ├─ backend/                  # NestJS + TypeORM
 │  └─ src/
 │     ├─ config/             # cấu hình theo concern (app/database/jwt)
@@ -149,11 +145,9 @@ Money_manager/
 - Đưa OCR lên production khi có GPU (hoặc dùng recognizer nhẹ `OCR_RECOGNIZER=paddle` để chạy CPU nhanh hơn, đánh đổi độ chính xác).
 - Bổ sung migration cho DB; thêm giao dịch định kỳ, đa tệ và export dữ liệu.
 
-Chi tiết & lộ trình đầy đủ: [`docs/07-roadmap-assumptions.md`](./docs/07-roadmap-assumptions.md).
-
 ## 🎯 Điểm nhấn thiết kế
 
 1. **Vòng phản hồi ngân sách → Dashboard:** logic tính đã-chi/hạn-mức ở backend nuôi trực quan ở frontend.
-2. **Decimal cho tiền tệ** (không dùng float), tách `occurredAt`/`createdAt`, ràng buộc unique chống trùng — xem [`docs/04-database.md`](./docs/04-database.md).
+2. **Decimal cho tiền tệ** (không dùng float), tách `occurredAt`/`createdAt`, ràng buộc unique chống trùng.
 3. **OCR ẩn sau interface** (Dependency Inversion) sẵn sàng cắm pipeline HTTP — dễ mở rộng.
 4. **UI/UX:** design system light/dark, số căn theo `tabular-nums`, animation count-up & progress fill, biểu đồ Recharts.
