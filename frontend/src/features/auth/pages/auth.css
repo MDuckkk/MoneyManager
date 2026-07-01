@@ -1,0 +1,23 @@
+.auth-form-head { margin-bottom: 22px; }
+.auth-form-title { font-size: 24px; font-weight: 800; }
+.auth-form-sub { color: var(--text-muted); margin-top: 6px; font-size: 14px; }
+.auth-form { display: flex; flex-direction: column; gap: 16px; }
+.auth-error {
+  background: var(--expense-soft);
+  color: var(--expense);
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13.5px;
+}
+.auth-switch { text-align: center; margin-top: 18px; font-size: 14px; color: var(--text-muted); }
+.auth-switch a { color: var(--brand); font-weight: 600; }
+.auth-demo {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border: 1px dashed var(--border-strong);
+  font-size: 12.5px;
+  color: var(--text-muted);
+  text-align: center;
+}

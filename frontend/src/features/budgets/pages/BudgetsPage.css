@@ -1,0 +1,30 @@
+.budget-summary {
+  display: flex;
+  align-items: center;
+  padding: 18px 24px;
+  margin-bottom: 16px;
+  gap: 24px;
+}
+.bs-item { display: flex; flex-direction: column; gap: 4px; }
+.bs-label { font-size: 13px; color: var(--text-muted); }
+.bs-value { font-size: 22px; font-weight: 800; }
+.bs-divider { width: 1px; align-self: stretch; background: var(--border); }
+
+.budget-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.budget-card { padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.bc-head { display: flex; align-items: center; justify-content: space-between; }
+.bc-name { font-weight: 700; font-size: 15px; }
+.bc-amounts { display: flex; align-items: baseline; }
+.bc-spent { font-size: 22px; font-weight: 800; }
+.bc-progress { height: 10px; }
+.bc-foot { display: flex; justify-content: space-between; }
+.bc-actions { display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid var(--border); padding-top: 12px; }
+
+@media (max-width: 640px) {
+  .budget-summary { flex-wrap: wrap; gap: 16px; }
+  .bs-divider { display: none; }
+}

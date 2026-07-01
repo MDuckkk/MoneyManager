@@ -1,0 +1,78 @@
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.filter-search { position: relative; flex: 1; min-width: 200px; }
+.filter-search__icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--text-faint);
+  pointer-events: none;
+}
+.filter-search__input { padding-left: 36px; padding-right: 32px; }
+.filter-search__clear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: var(--border-strong);
+  color: var(--surface);
+  font-size: 15px;
+  line-height: 1;
+}
+.filter-search__clear:hover { filter: brightness(0.92); }
+.filter-bar .select { width: auto; min-width: 150px; }
+
+.tx-groups { display: flex; flex-direction: column; gap: 16px; }
+.tx-group { padding: 6px 18px 10px; }
+.tx-group-head {
+  display: flex;
+  align-items: center;
+  padding: 12px 0 8px;
+}
+.tx-group-date { font-size: 13px; font-weight: 700; color: var(--text-muted); }
+
+.tx-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-top: 1px solid var(--border); }
+.tx-icon { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-size: 19px; flex-shrink: 0; }
+.tx-main { flex: 1; min-width: 0; }
+.tx-name { font-weight: 600; font-size: 14.5px; }
+.tx-note { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tx-amount { font-weight: 700; font-size: 15px; }
+.tx-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.15s; }
+.tx-row:hover .tx-actions { opacity: 1; }
+
+.pager { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 8px; }
+
+/* Transaction form modal */
+.tx-form { display: flex; flex-direction: column; gap: 16px; }
+.type-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: var(--surface-2); padding: 4px; border-radius: 12px; }
+.type-btn {
+  padding: 9px;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-muted);
+  transition: all 0.15s;
+}
+.type-btn.active { background: var(--surface); box-shadow: var(--shadow-sm); }
+.type-btn.active.expense { color: var(--expense); }
+.type-btn.active.income { color: var(--income); }
+
+@media (max-width: 640px) {
+  .tx-actions { opacity: 1; }
+}

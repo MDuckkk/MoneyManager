@@ -1,0 +1,46 @@
+.cat-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+.cat-grid { display: flex; flex-direction: column; gap: 4px; }
+.cat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 8px;
+  border-radius: 12px;
+  transition: background 0.12s;
+}
+.cat-item:hover { background: var(--surface-2); }
+.cat-icon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-size: 18px; flex-shrink: 0; }
+.cat-name { flex: 1; font-weight: 600; font-size: 14.5px; }
+.cat-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.15s; }
+.cat-item:hover .cat-actions { opacity: 1; }
+
+/* Pickers */
+.picker { display: flex; flex-wrap: wrap; gap: 8px; }
+.picker-item {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  font-size: 19px;
+  transition: all 0.12s;
+}
+.picker-item:hover { border-color: var(--brand); }
+.picker-item.sel { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-soft); }
+.color-dot {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.color-dot:hover { transform: scale(1.1); }
+.color-dot.sel { box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px currentColor; }
+
+@media (max-width: 760px) {
+  .cat-columns { grid-template-columns: 1fr; }
+  .cat-actions { opacity: 1; }
+}

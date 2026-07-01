@@ -1,0 +1,38 @@
+.auth-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+}
+.auth-aside {
+  position: relative;
+  padding: 56px 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+  color: #fff;
+  background: linear-gradient(150deg, #4f46e5 0%, #6366f1 45%, #8b5cf6 100%);
+  overflow: hidden;
+}
+.auth-aside::after {
+  content: '';
+  position: absolute;
+  width: 520px; height: 520px;
+  right: -160px; top: -160px;
+  background: radial-gradient(circle, rgba(255,255,255,0.18), transparent 60%);
+  border-radius: 50%;
+}
+.auth-brand { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; }
+.auth-brand .brand-mark { background: rgba(255,255,255,0.18); box-shadow: none; }
+.auth-hero-title { font-size: 38px; line-height: 1.1; margin-top: 12px; max-width: 440px; }
+.auth-hero-sub { font-size: 16px; opacity: 0.92; max-width: 420px; line-height: 1.6; }
+.auth-points { list-style: none; padding: 0; margin: 14px 0 0; display: flex; flex-direction: column; gap: 12px; }
+.auth-points li { font-size: 15px; opacity: 0.95; }
+
+.auth-main { display: grid; place-items: center; padding: 32px; }
+.auth-card { width: 100%; max-width: 380px; }
+
+@media (max-width: 860px) {
+  .auth-shell { grid-template-columns: 1fr; }
+  .auth-aside { display: none; }
+}
