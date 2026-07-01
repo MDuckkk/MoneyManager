@@ -1,0 +1,38 @@
+# Unified CPU/Linux deps for containerized deploy (ocr_service).
+#
+# torch (CPU) and paddlepaddle (CPU) are installed separately in the Dockerfile
+# because torch needs the CPU wheel index:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+#   pip install paddlepaddle==3.3.1
+#
+# For Windows/GPU development keep using requirements-paddle.txt + requirements-surya.txt
+# (two venvs) — see CLAUDE.md. This file is the deploy path only.
+
+# --- OCR core ---
+paddleocr==3.7.0
+paddlex[ocr]==3.7.1
+surya-ocr==0.17.1
+transformers==4.57.6
+
+# --- Doc / image handling ---
+pymupdf
+pillow
+numpy<2.4
+opencv-python-headless          # cv2 for preprocess.py (headless: no system libGL)
+jdeskew                         # deskew tilted phone photos (degrades gracefully if absent)
+
+# --- HTTP API ---
+fastapi
+uvicorn[standard]
+python-multipart                # REQUIRED: FastAPI multipart Form + File parsing in /ocr
+python-dotenv
+
+# --- Misc runtime ---
+psutil
+
+# --- Optional persistence (kept installable so OCR_DB_URL can re-enable it;
+#     default deploy runs stateless with OCR_DB_URL="") ---
+sqlalchemy>=2.0
+
+# NOTE: google-genai / google-auth intentionally omitted — the deploy runs keyless
+# (OCR_ENABLE_POLICY=0). Page classification falls back to keyword/regex without them.

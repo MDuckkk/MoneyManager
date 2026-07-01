@@ -11,7 +11,7 @@ const LoginPage = () => {
   const { login } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: 'demo@money.app', password: 'password123' });
+  const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -71,10 +71,6 @@ const LoginPage = () => {
           {loading ? <Spinner /> : 'Đăng nhập'}
         </button>
       </form>
-
-      <div className="auth-demo">
-        Tài khoản demo: <b>demo@money.app</b> / <b>password123</b>
-      </div>
 
       <div className="auth-switch">
         Chưa có tài khoản? <Link to={ROUTES.REGISTER}>Đăng ký ngay</Link>

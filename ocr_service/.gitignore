@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.venv*/
+venv/
+
+# Env (cấu hình local / máy chủ — không commit; xem .env.example)
+.env
+
+# Service account / khoá riêng — TUYỆT ĐỐI KHÔNG commit
+service_account.json
+*-*.json
+!templates/*.json
+
+# Model cache
+model/
+.paddlex/
+
+# Output generated bởi pipeline — không track (tránh repo bloat + cache cũ che regression)
+results/
+summary/
+results_api/
+
+# test-generated temp dirs
+tests/_tmp_logo_matcher/
+tests/_tmp_visual_objects/
+
+.superpowers/
+docs/onboarding/

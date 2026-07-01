@@ -1,0 +1,23 @@
+# Keep the build context small: only app.py + services/ + test/ are needed.
+.git
+.gitignore
+.venv*
+__pycache__/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+pytest-cache-files-*/
+.planning/
+docs/
+
+# Runtime outputs / caches (regenerated):
+results/
+results_api/
+summary/
+model/
+.paddlex/
+services/results_api/
+.env
+# NOTE: test/ (ảnh hoá đơn mẫu, ~0.7 MB) được giữ để smoke test /scan ngay trong image.
+# Bỏ dòng dưới nếu muốn image nhẹ hơn:
+# test/
