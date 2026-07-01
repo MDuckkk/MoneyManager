@@ -6,6 +6,16 @@
 
 ![stack](https://img.shields.io/badge/Backend-NestJS%20%2B%20TypeORM-E0234E) ![stack](https://img.shields.io/badge/Frontend-React%2019%20%2B%20Vite-61DAFB) ![db](https://img.shields.io/badge/DB-PostgreSQL-336791)
 
+### 🌐 Sản phẩm đang chạy (live)
+
+- **Web:** https://money.mduckkk.me
+- **API:** https://api.money.mduckkk.me/api (Swagger: `/api/docs`)
+- **Tài khoản demo:** `demo@money.app` / `password123`
+
+> ⚠️ **Lưu ý quan trọng về OCR trên production**
+> Tính năng **Quét hóa đơn (OCR)** đã được **phát triển đầy đủ và chạy được ở môi trường local** (service riêng trong [`ocr_service/`](./ocr_service), pipeline PaddleOCR + Surya), nhưng **KHÔNG được deploy lên production** vì **hạ tầng hiện tại chưa có GPU**. Trên CPU, mô hình nhận dạng Surya mất tới vài phút cho mỗi ảnh nên không đáp ứng thời gian phản hồi thực tế.
+> ➡️ Vì vậy bản deploy tại `money.mduckkk.me` chỉ gồm **Frontend + Backend + PostgreSQL**; OCR chạy/demo ở local. Chi tiết giả định & hướng phát triển ở mục [Giả định & Giới hạn](#-giả-định--giới-hạn) và [`docs/06-ocr-feature.md`](./docs/06-ocr-feature.md).
+
 ---
 
 ## ✨ Tính năng
@@ -18,7 +28,7 @@
 | **Ngân sách** | Đặt hạn mức theo tháng, theo dõi tiến độ + cảnh báo vượt (SAFE/WARNING/EXCEEDED) |
 | **Tổng quan** | KPI thu/chi/số dư, biểu đồ cơ cấu chi (donut), thu-chi theo tháng (bar), so sánh tháng trước |
 
-> 🧾 **Quét hóa đơn (OCR)** đã được thiết kế sẵn (tách sau interface `OcrProvider`) và sẽ triển khai sau — xem [`docs/06-ocr-feature.md`](./docs/06-ocr-feature.md).
+> 🧾 **Quét hóa đơn (OCR)** — đã hiện thực đầy đủ dưới dạng service riêng ([`ocr_service/`](./ocr_service)) và ẩn sau interface `OcrProvider`. **Chạy được ở local**, nhưng chưa deploy production do chưa có GPU (xem lưu ý ở đầu README) — chi tiết [`docs/06-ocr-feature.md`](./docs/06-ocr-feature.md).
 
 ## 🛠️ Công nghệ
 
@@ -64,6 +74,30 @@ Email:    demo@money.app
 Mật khẩu: password123
 ```
 
+### 4. (Tùy chọn) OCR service — chỉ chạy local
+```bash
+cd ocr_service
+cp .env.example .env         # OCR_RECOGNIZER=surya + OCR_TABLE_RECOGNITION=1 (pipeline đầy đủ)
+python app.py                # FastAPI: POST /scan trả ParsedReceipt
+# Backend trỏ tới service qua biến OCR_SERVICE_URL
+```
+> ⚠️ Trên CPU, một ảnh mất tới **vài phút** để nhận dạng (Surya là transformer OCR). Vì vậy service này **chỉ dùng ở local để demo**, chưa deploy production (cần GPU để đạt tốc độ thực tế).
+
+---
+
+## ☁️ Deploy production
+
+Bản đang chạy tại `money.mduckkk.me` được deploy bằng Docker Compose (Caddy tự cấp TLS):
+
+```bash
+cd deploy
+cp .env.example .env         # điền domain + secret (JWT, DB password)
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+- **Web** → `money.mduckkk.me`, **API** → `api.money.mduckkk.me` (reverse proxy qua Caddy).
+- Thành phần deploy: **Frontend + Backend (NestJS) + PostgreSQL**. **Không gồm OCR** (xem lưu ý ở đầu README).
+
 ---
 
 ## 🧪 Kiểm thử
@@ -100,11 +134,22 @@ Money_manager/
 
 ## 📌 Giả định & Giới hạn
 
-- 1 người dùng – 1 loại tiền tệ (VND) – không chia ví/tài khoản.
-- `DB_SYNCHRONIZE=true` cho môi trường dev (TypeORM tự tạo bảng). Production nên dùng migration.
-- Chưa có: giao dịch định kỳ, đa tệ, export CSV, OCR (đã thiết kế, triển khai sau).
+> 📝 *Theo góp ý của mentor: các tính năng chưa kịp hoàn thiện, cùng giả định, giới hạn và hướng phát triển được ghi rõ dưới đây.*
 
-Chi tiết & hướng phát triển: [`docs/07-roadmap-assumptions.md`](./docs/07-roadmap-assumptions.md).
+**Giả định**
+- 1 người dùng – 1 loại tiền tệ (VND) – không chia ví/tài khoản.
+- Số tiền lưu bằng `Decimal` (không dùng float) để tránh sai số.
+
+**Giới hạn hiện tại**
+- **OCR chưa deploy production:** đã hiện thực đầy đủ và chạy được ở local, nhưng hạ tầng chưa có **GPU** nên trên CPU quá chậm (Surya ~vài phút/ảnh) để phục vụ thật. Bản online chỉ gồm FE + BE + DB.
+- `DB_SYNCHRONIZE=true` đang bật cho cả dev lẫn bản demo (TypeORM tự tạo bảng). Production thực tế nên chuyển sang **migration** trước khi tắt cờ này.
+- Chưa có: giao dịch định kỳ, đa tệ, export CSV.
+
+**Hướng phát triển**
+- Đưa OCR lên production khi có GPU (hoặc dùng recognizer nhẹ `OCR_RECOGNIZER=paddle` để chạy CPU nhanh hơn, đánh đổi độ chính xác).
+- Bổ sung migration cho DB; thêm giao dịch định kỳ, đa tệ và export dữ liệu.
+
+Chi tiết & lộ trình đầy đủ: [`docs/07-roadmap-assumptions.md`](./docs/07-roadmap-assumptions.md).
 
 ## 🎯 Điểm nhấn thiết kế
 
