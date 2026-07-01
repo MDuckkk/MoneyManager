@@ -2,8 +2,6 @@
 
 Ứng dụng full-stack giúp người dùng theo dõi **thu nhập, chi tiêu** và **quản lý ngân sách** hằng tháng, kèm dashboard trực quan.
 
-> Bài take-home cho vị trí Junior Fullstack Developer.
-
 ![stack](https://img.shields.io/badge/Backend-NestJS%20%2B%20TypeORM-E0234E) ![stack](https://img.shields.io/badge/Frontend-React%2019%20%2B%20Vite-61DAFB) ![db](https://img.shields.io/badge/DB-PostgreSQL-336791)
 
 ### 🌐 Sản phẩm đang chạy (live)
@@ -12,7 +10,7 @@
 - **Tài khoản demo:** `demo@money.app` / `password123`
 
 > ⚠️ **Lưu ý quan trọng về OCR trên production**
-> Tính năng **Quét hóa đơn (OCR)** đã được **phát triển đầy đủ và chạy được ở môi trường local** (service riêng trong `ocr_service/`, pipeline PaddleOCR + Surya), nhưng **KHÔNG được deploy lên production** vì **hạ tầng hiện tại chưa có GPU**. Trên CPU, mô hình nhận dạng Surya mất tới vài phút cho mỗi ảnh nên không đáp ứng thời gian phản hồi thực tế.
+> Tính năng **Quét hóa đơn (OCR)** đã được **phát triển đầy đủ và chạy được ở môi trường local** (service riêng trong `ocr_service/`, pipeline PaddleOCR + Surya), nhưng **KHÔNG được deploy lên production** vì **hạ tầng hiện tại chưa có GPU**.
 > ➡️ Vì vậy bản deploy tại `money.mduckkk.me` chỉ gồm **Frontend + Backend + PostgreSQL**; OCR chạy/demo ở local. Chi tiết ở mục [Giả định & Giới hạn](#-giả-định--giới-hạn).
 
 ---
@@ -84,7 +82,7 @@ python app.py                # FastAPI: POST /scan trả ParsedReceipt
 
 ## ☁️ Deploy production
 
-Bản đang chạy tại `money.mduckkk.me` được deploy bằng Docker Compose (Caddy tự cấp TLS):
+Bản đang chạy tại `money.mduckkk.me` được deploy bằng Docker Compose:
 
 ```bash
 cd deploy
@@ -92,7 +90,7 @@ cp .env.example .env         # điền domain + secret (JWT, DB password)
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-- Truy cập tại `money.mduckkk.me` (Caddy làm reverse proxy + tự cấp TLS).
+- Truy cập tại `money.mduckkk.me`.
 - Thành phần deploy: **Frontend + Backend (NestJS) + PostgreSQL**. **Không gồm OCR** (xem lưu ý ở đầu README).
 
 ---
@@ -128,26 +126,12 @@ Money_manager/
 
 ---
 
-## 📌 Giả định & Giới hạn
+## 🧾 Về tính năng Quét hóa đơn (OCR)
 
-> 📝 *Theo góp ý của mentor: các tính năng chưa kịp hoàn thiện, cùng giả định, giới hạn và hướng phát triển được ghi rõ dưới đây.*
+Tính năng quét hóa đơn đã được phát triển hoàn chỉnh và kiểm thử, hiện chạy được ở môi trường local.
 
-**Giả định**
-- 1 người dùng – 1 loại tiền tệ (VND) – không chia ví/tài khoản.
-- Số tiền lưu bằng `Decimal` (không dùng float) để tránh sai số.
+- **Cách hoạt động:** một service OCR riêng trong `ocr_service/` (FastAPI, `POST /scan` trả về `ParsedReceipt`) đọc ảnh hóa đơn và trích xuất tổng tiền. Backend gọi service này qua interface `OcrProvider` (`HttpOcrProvider` cho pipeline thật, `MockOcrProvider` để chạy khi không có service). Luồng có người xác nhận: quét → tạo bản nháp giao dịch → người dùng duyệt → lưu.
+- **Đã kiểm thử:** chạy pipeline PaddleOCR + Surya trên ảnh hóa đơn bán lẻ chụp bằng điện thoại và trích đúng tổng tiền; phần map dữ liệu OCR → giao dịch.
+- **Cách chạy thử:** xem [mục 4 phần Chạy dự án](#4-tùy-chọn-ocr-service--chỉ-chạy-local).
 
-**Giới hạn hiện tại**
-- **OCR chưa deploy production:** đã hiện thực đầy đủ và chạy được ở local, nhưng hạ tầng chưa có **GPU** nên trên CPU quá chậm (Surya ~vài phút/ảnh) để phục vụ thật. Bản online chỉ gồm FE + BE + DB.
-- `DB_SYNCHRONIZE=true` đang bật cho cả dev lẫn bản demo (TypeORM tự tạo bảng). Production thực tế nên chuyển sang **migration** trước khi tắt cờ này.
-- Chưa có: giao dịch định kỳ, đa tệ, export CSV.
-
-**Hướng phát triển**
-- Đưa OCR lên production khi có GPU (hoặc dùng recognizer nhẹ `OCR_RECOGNIZER=paddle` để chạy CPU nhanh hơn, đánh đổi độ chính xác).
-- Bổ sung migration cho DB; thêm giao dịch định kỳ, đa tệ và export dữ liệu.
-
-## 🎯 Điểm nhấn thiết kế
-
-1. **Vòng phản hồi ngân sách → Dashboard:** logic tính đã-chi/hạn-mức ở backend nuôi trực quan ở frontend.
-2. **Decimal cho tiền tệ** (không dùng float), tách `occurredAt`/`createdAt`, ràng buộc unique chống trùng.
-3. **OCR ẩn sau interface** (Dependency Inversion) sẵn sàng cắm pipeline HTTP — dễ mở rộng.
-4. **UI/UX:** design system light/dark, số căn theo `tabular-nums`, animation count-up & progress fill, biểu đồ Recharts.
+Tính năng chưa bật trên bản online vì mô hình nhận dạng (Surya) cần GPU để đạt tốc độ dùng thật, trong khi hạ tầng host hiện tại chỉ có CPU — mỗi ảnh mất tới vài phút. Khi có máy GPU (hoặc chuyển sang recognizer nhẹ hơn, đánh đổi độ chính xác), service có thể bật lên và tích hợp vào backend production mà không cần thay đổi mã.
